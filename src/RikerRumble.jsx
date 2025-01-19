@@ -81,6 +81,16 @@ function App() {
     width: `${CONTENT_WIDTH}px`,
   };
 
+  const thStyle = {
+    border: "1px solid #ccc",
+    padding: "5px",
+    backgroundColor: "black",
+    color: "white",
+    fontSize: "24px",
+    fontWeight: "bold",
+    textAlign: "center",
+  };
+
   const addScore = (scoreInput, scores, setScores, history, setHistory) => {
     const newScore = parseInt(scoreInput, 10);
     if (!isNaN(newScore)) {
@@ -159,15 +169,18 @@ function App() {
     const p1 = player1Scores[index];
     const p2 = player2Scores[index];
     const bg = p1 > p2 && p1 > 0 ? "#f51dff" : "black";
+
     return (
       <tr key={index}>
         <td
           style={{
             border: "1px solid #ccc",
             padding: "5px",
-            textAlign: "right",
             backgroundColor: bg,
             color: "white",
+            fontSize: "18px",
+            fontWeight: "bold",
+            textAlign: "center",
           }}
         >
           {p1.toLocaleString()}
@@ -180,15 +193,18 @@ function App() {
     const p1 = player1Scores[index];
     const p2 = player2Scores[index];
     const bg = p2 > p1 && p2 > 0 ? "#1d70ff" : "black";
+
     return (
       <tr key={index}>
         <td
           style={{
             border: "1px solid #ccc",
             padding: "5px",
-            textAlign: "right",
             backgroundColor: bg,
             color: "white",
+            fontSize: "18px",
+            fontWeight: "bold",
+            textAlign: "center",
           }}
         >
           {p2.toLocaleString()}
@@ -207,12 +223,7 @@ function App() {
           height: 100%;
         }
       `}</style>
-      <div
-        style={{
-          minHeight: "100vh",
-          color: "white",
-        }}
-      >
+      <div style={{ minHeight: "100vh", color: "white" }}>
         <div style={containerStyle}>
           <div style={columnStyle}>
             <div style={{ marginBottom: "15px" }}>
@@ -345,21 +356,11 @@ function App() {
 
         <div style={containerStyle}>
           <div style={columnStyle}>
-            <h3 style={{ textAlign: "center", marginBottom: "10px" }}>
-              {player1Name}
-            </h3>
             <table style={tableStyle}>
               <thead>
                 <tr>
-                  <th
-                    style={{
-                      border: "1px solid #ccc",
-                      padding: "5px",
-                      backgroundColor: "black",
-                      color: "white",
-                    }}
-                  >
-                    Score
+                  <th className="ribeye-marrow-regular" style={thStyle}>
+                    {player1Name}
                   </th>
                 </tr>
               </thead>
@@ -368,21 +369,11 @@ function App() {
           </div>
 
           <div style={columnStyle}>
-            <h3 style={{ textAlign: "center", marginBottom: "10px" }}>
-              {player2Name}
-            </h3>
             <table style={tableStyle}>
               <thead>
                 <tr>
-                  <th
-                    style={{
-                      border: "1px solid #ccc",
-                      padding: "5px",
-                      backgroundColor: "black",
-                      color: "white",
-                    }}
-                  >
-                    Score
+                  <th className="ribeye-marrow-regular" style={thStyle}>
+                    {player2Name}
                   </th>
                 </tr>
               </thead>

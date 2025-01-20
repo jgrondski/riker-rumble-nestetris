@@ -1,6 +1,17 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import PlayerColumn from "./PlayerColumn";
+import PlayerTable from "./PlayerTable";
+import TitleSection from "./TitleSection";
+import TimerSection from "./TimerSection";
+import CountdownDisplay from "./CountdownDisplay";
+import {
+  globalRootStyle,
+  containerStyle,
+  rowBaseStyle,
+} from "./RikerRumble.styles";
 
-function App() {
+function RikerRumble() {
+  // -- Existing state/logic for players --
   const [player1Name, setPlayer1Name] = useState("Player 1");
   const [player2Name, setPlayer2Name] = useState("Player 2");
 
@@ -13,84 +24,6 @@ function App() {
   const [player1History, setPlayer1History] = useState([]);
   const [player2History, setPlayer2History] = useState([]);
 
-  const COLUMN_WIDTH = 300;
-  const CONTENT_WIDTH = 250;
-  const ELEMENT_HEIGHT = 35;
-
-  const containerStyle = {
-    display: "flex",
-    marginTop: "20px",
-    marginLeft: "20px",
-    marginRight: "20px",
-  };
-
-  const columnStyle = {
-    width: `${COLUMN_WIDTH}px`,
-    marginRight: "20px",
-    display: "flex",
-    flexDirection: "column",
-    alignItems: "center",
-  };
-
-  const labelStyle = {
-    display: "block",
-    marginBottom: "5px",
-    fontWeight: "bold",
-    textAlign: "center",
-  };
-
-  const inputStyle = {
-    width: `${CONTENT_WIDTH}px`,
-    height: `${ELEMENT_HEIGHT}px`,
-    boxSizing: "border-box",
-    marginBottom: "5px",
-    textAlign: "center",
-  };
-
-  const buttonGroupStyle = {
-    display: "flex",
-    gap: "10px",
-    width: `${CONTENT_WIDTH}px`,
-    marginBottom: "20px",
-  };
-
-  const buttonStyle = {
-    flex: 1,
-    height: `${ELEMENT_HEIGHT}px`,
-    display: "inline-flex",
-    alignItems: "center",
-    justifyContent: "center",
-    cursor: "pointer",
-  };
-
-  const headingStyle = {
-    textAlign: "center",
-    marginBottom: "20px",
-  };
-
-  const middleSectionStyle = {
-    textAlign: "center",
-    marginTop: "20px",
-    marginBottom: "20px",
-  };
-
-  const tableStyle = {
-    margin: "0 auto",
-    borderCollapse: "collapse",
-    border: "1px solid #ccc",
-    width: `${CONTENT_WIDTH}px`,
-  };
-
-  const thStyle = {
-    border: "1px solid #ccc",
-    padding: "5px",
-    backgroundColor: "black",
-    color: "white",
-    fontSize: "24px",
-    fontWeight: "bold",
-    textAlign: "center",
-  };
-
   const addScore = (scoreInput, scores, setScores, history, setHistory) => {
     const newScore = parseInt(scoreInput, 10);
     if (!isNaN(newScore)) {
@@ -99,7 +32,6 @@ function App() {
       const tableChanged =
         topThree.length !== scores.length ||
         topThree.some((val, i) => val !== scores[i]);
-
       if (tableChanged) {
         if (history.length === 10) history.shift();
         history.push([...scores]);
@@ -109,7 +41,7 @@ function App() {
     }
   };
 
-  const handleUndo = (scores, setScores, history, setHistory) => {
+  const handleUndo = (setScores, history, setHistory) => {
     if (history.length > 0) {
       const previous = history[history.length - 1];
       setScores(previous);
@@ -165,225 +97,152 @@ function App() {
     setPlayer2ScoreInput("");
   };
 
-  const renderPlayer1Row = (score, index) => {
+  const renderPlayer1Row = (_, index) => {
     const p1 = player1Scores[index];
     const p2 = player2Scores[index];
     const bg = p1 > p2 && p1 > 0 ? "#f51dff" : "black";
-
     return (
       <tr key={index}>
-        <td
-          style={{
-            border: "1px solid #ccc",
-            padding: "5px",
-            backgroundColor: bg,
-            color: "white",
-            fontSize: "18px",
-            fontWeight: "bold",
-            textAlign: "center",
-          }}
-        >
+        <td style={{ ...rowBaseStyle, backgroundColor: bg }}>
           {p1.toLocaleString()}
         </td>
       </tr>
     );
   };
 
-  const renderPlayer2Row = (score, index) => {
+  const renderPlayer2Row = (_, index) => {
     const p1 = player1Scores[index];
     const p2 = player2Scores[index];
     const bg = p2 > p1 && p2 > 0 ? "#1d70ff" : "black";
-
     return (
       <tr key={index}>
-        <td
-          style={{
-            border: "1px solid #ccc",
-            padding: "5px",
-            backgroundColor: bg,
-            color: "white",
-            fontSize: "18px",
-            fontWeight: "bold",
-            textAlign: "center",
-          }}
-        >
+        <td style={{ ...rowBaseStyle, backgroundColor: bg }}>
           {p2.toLocaleString()}
         </td>
       </tr>
     );
   };
 
+  // -- NEW: Countdown Timer Logic --
+  const [minutesInput, setMinutesInput] = useState("40"); // default "40"
+  const [timeLeft, setTimeLeft] = useState(40 * 60); // store time in seconds
+  const [isRunning, setIsRunning] = useState(false);
+
+  // Start/Pause
+  const handleStartPause = () => {
+    setIsRunning((prev) => !prev);
+  };
+
+  // Reset to minutesInput
+  const handleReset = () => {
+    const num = parseInt(minutesInput, 10);
+    if (!isNaN(num)) {
+      setTimeLeft(num * 60);
+      setIsRunning(false); // also pause
+    }
+  };
+
+  // Sync with isRunning
+  useEffect(() => {
+    let interval = null;
+    if (isRunning) {
+      interval = setInterval(() => {
+        setTimeLeft((prev) => (prev > 0 ? prev - 1 : 0));
+      }, 1000);
+    }
+    return () => {
+      if (interval) clearInterval(interval);
+    };
+  }, [isRunning]);
+
+  // Format for MM:SS display
+  const formatTime = (seconds) => {
+    const m = Math.floor(seconds / 60);
+    const s = seconds % 60;
+    return `${m.toString().padStart(2, "0")}:${s.toString().padStart(2, "0")}`;
+  };
+
   return (
     <>
-      <style>{`
-        html, body {
-          margin: 0;
-          padding: 0;
-          background-color: black;
-          height: 100%;
-        }
-      `}</style>
-      <div style={{ minHeight: "100vh", color: "white" }}>
+      <div style={globalRootStyle}>
+        {/* 1) Player columns */}
         <div style={containerStyle}>
-          <div style={columnStyle}>
-            <div style={{ marginBottom: "15px" }}>
-              <label style={labelStyle}>Player 1 Name:</label>
-              <input
-                type="text"
-                value={player1Name}
-                onChange={(e) => setPlayer1Name(e.target.value)}
-                style={inputStyle}
-              />
-            </div>
-            <div style={{ marginBottom: "5px" }}>
-              <label style={labelStyle}>Player {player1Name} Score:</label>
-              <input
-                type="number"
-                value={player1ScoreInput}
-                onChange={(e) => setPlayer1ScoreInput(e.target.value)}
-                onKeyDown={(e) => {
-                  if (e.key === "Enter") handlePlayer1Add();
-                }}
-                style={inputStyle}
-              />
-            </div>
-            <div style={buttonGroupStyle}>
-              <button
-                style={buttonStyle}
-                onClick={() =>
-                  handleClear(
-                    player1Scores,
-                    setPlayer1Scores,
-                    player1History,
-                    setPlayer1History
-                  )
-                }
-              >
-                clear
-              </button>
-              <button
-                style={buttonStyle}
-                onClick={() =>
-                  handleUndo(
-                    player1Scores,
-                    setPlayer1Scores,
-                    player1History,
-                    setPlayer1History
-                  )
-                }
-              >
-                undo
-              </button>
-              <button style={buttonStyle} onClick={handlePlayer1Add}>
-                add
-              </button>
-            </div>
-          </div>
-          <div style={columnStyle}>
-            <div style={{ marginBottom: "15px" }}>
-              <label style={labelStyle}>Player 2 Name:</label>
-              <input
-                type="text"
-                value={player2Name}
-                onChange={(e) => setPlayer2Name(e.target.value)}
-                style={inputStyle}
-              />
-            </div>
-            <div style={{ marginBottom: "5px" }}>
-              <label style={labelStyle}>Player {player2Name} Score:</label>
-              <input
-                type="number"
-                value={player2ScoreInput}
-                onChange={(e) => setPlayer2ScoreInput(e.target.value)}
-                onKeyDown={(e) => {
-                  if (e.key === "Enter") handlePlayer2Add();
-                }}
-                style={inputStyle}
-              />
-            </div>
-            <div style={buttonGroupStyle}>
-              <button
-                style={buttonStyle}
-                onClick={() =>
-                  handleClear(
-                    player2Scores,
-                    setPlayer2Scores,
-                    player2History,
-                    setPlayer2History
-                  )
-                }
-              >
-                clear
-              </button>
-              <button
-                style={buttonStyle}
-                onClick={() =>
-                  handleUndo(
-                    player2Scores,
-                    setPlayer2Scores,
-                    player2History,
-                    setPlayer2History
-                  )
-                }
-              >
-                undo
-              </button>
-              <button style={buttonStyle} onClick={handlePlayer2Add}>
-                add
-              </button>
-            </div>
-          </div>
+          <PlayerColumn
+            label="Player 1"
+            playerName={player1Name}
+            setPlayerName={setPlayer1Name}
+            playerScoreInput={player1ScoreInput}
+            setPlayerScoreInput={setPlayer1ScoreInput}
+            onAdd={handlePlayer1Add}
+            onClear={() =>
+              handleClear(
+                player1Scores,
+                setPlayer1Scores,
+                player1History,
+                setPlayer1History
+              )
+            }
+            onUndo={() =>
+              handleUndo(
+                (player1Scores) => setPlayer1Scores(player1Scores),
+                player1History,
+                setPlayer1History
+              )
+            }
+          />
+          <PlayerColumn
+            label="Player 2"
+            playerName={player2Name}
+            setPlayerName={setPlayer2Name}
+            playerScoreInput={player2ScoreInput}
+            setPlayerScoreInput={setPlayer2ScoreInput}
+            onAdd={handlePlayer2Add}
+            onClear={() =>
+              handleClear(
+                player2Scores,
+                setPlayer2Scores,
+                player2History,
+                setPlayer2History
+              )
+            }
+            onUndo={() =>
+              handleUndo(
+                (player2Scores) => setPlayer2Scores(player2Scores),
+                player2History,
+                setPlayer2History
+              )
+            }
+          />
         </div>
 
-        <div style={middleSectionStyle}>
-          <button
-            style={{
-              ...buttonStyle,
-              width: "120px",
-              margin: "0 auto",
-              marginBottom: "20px",
-              backgroundColor: "gray",
-              border: "1px solid #ccc",
-            }}
-            onClick={handleClearAll}
-          >
-            Clear All
-          </button>
-          <h1 className="ribeye-marrow-regular" style={headingStyle}>
-            Riker Rumble
-          </h1>
-        </div>
+        {/* 2) Timer Section (minutes input + reset/start/pause) */}
+        <TimerSection
+          minutesInput={minutesInput}
+          setMinutesInput={setMinutesInput}
+          handleReset={handleReset}
+          handleStartPause={handleStartPause}
+        />
 
+        {/* 3) Title + "Clear All" */}
+        <TitleSection onClearAll={handleClearAll} />
+
+        {/* 4) Player Tables */}
         <div style={containerStyle}>
-          <div style={columnStyle}>
-            <table style={tableStyle}>
-              <thead>
-                <tr>
-                  <th className="ribeye-marrow-regular" style={thStyle}>
-                    {player1Name}
-                  </th>
-                </tr>
-              </thead>
-              <tbody>{player1Scores.map(renderPlayer1Row)}</tbody>
-            </table>
-          </div>
-
-          <div style={columnStyle}>
-            <table style={tableStyle}>
-              <thead>
-                <tr>
-                  <th className="ribeye-marrow-regular" style={thStyle}>
-                    {player2Name}
-                  </th>
-                </tr>
-              </thead>
-              <tbody>{player2Scores.map(renderPlayer2Row)}</tbody>
-            </table>
-          </div>
+          <PlayerTable
+            playerName={player1Name}
+            rows={player1Scores.map(renderPlayer1Row)}
+          />
+          <PlayerTable
+            playerName={player2Name}
+            rows={player2Scores.map(renderPlayer2Row)}
+          />
         </div>
+
+        {/* 5) Countdown Display (below the tables) */}
+        <CountdownDisplay timeString={formatTime(timeLeft)} />
       </div>
     </>
   );
 }
 
-export default App;
+export default RikerRumble;

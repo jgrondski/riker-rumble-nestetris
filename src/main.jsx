@@ -1,10 +1,10 @@
 import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
 import "./index.css";
-import App from "./RikerRumble";
+import RikerRumble from "./RikerRumble";
 
 createRoot(document.getElementById("root")).render(
   <StrictMode>
-    <App />
+    <RikerRumble />
   </StrictMode>
 );

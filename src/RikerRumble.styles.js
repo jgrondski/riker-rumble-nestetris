@@ -112,3 +112,9 @@ export const clearAllButtonStyle = {
   backgroundColor: "gray",
   border: "1px solid #ccc",
 };
+
+export const scoreStyle = {
+  fontSize: "3.2em", // same as the timer
+  color: "white",
+  textAlign: "center",
+};

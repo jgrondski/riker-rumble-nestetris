@@ -18,6 +18,7 @@ function PlayerColumn({
   onAdd,
   onClear,
   onUndo,
+  isRunning,
 }) {
   return (
     <div style={columnStyle}>
@@ -43,13 +44,27 @@ function PlayerColumn({
         />
       </div>
       <div style={buttonGroupStyle}>
-        <button style={buttonStyle} onClick={onClear}>
+        <button
+          style={buttonStyle}
+          onClick={onClear}
+          disabled={isRunning}
+          onMouseDown={(e) => e.target.blur()}
+        >
           clear
         </button>
-        <button style={buttonStyle} onClick={onUndo}>
+        <button
+          style={buttonStyle}
+          onClick={onUndo}
+          disabled={isRunning}
+          onMouseDown={(e) => e.target.blur()}
+        >
           undo
         </button>
-        <button style={buttonStyle} onClick={onAdd}>
+        <button
+          style={buttonStyle}
+          onClick={onAdd}
+          onMouseDown={(e) => e.target.blur()}
+        >
           add
         </button>
       </div>
@@ -66,6 +81,7 @@ PlayerColumn.propTypes = {
   onAdd: PropTypes.func.isRequired,
   onClear: PropTypes.func.isRequired,
   onUndo: PropTypes.func.isRequired,
+  isRunning: PropTypes.bool.isRequired,
 };
 
 export default PlayerColumn;

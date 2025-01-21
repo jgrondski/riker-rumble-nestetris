@@ -3,7 +3,7 @@ import PlayerColumn from "./PlayerColumn";
 import PlayerTable from "./PlayerTable";
 import TitleSection from "./TitleSection";
 import TimerSection from "./TimerSection";
-import CountdownDisplay from "./CountdownDisplay";
+import ScoresCountdownRow from "./ScoresCountdownRow";
 import {
   globalRootStyle,
   containerStyle,
@@ -11,7 +11,6 @@ import {
 } from "./RikerRumble.styles";
 
 function RikerRumble() {
-  // -- Existing state/logic for players --
   const [player1Name, setPlayer1Name] = useState("Player 1");
   const [player2Name, setPlayer2Name] = useState("Player 2");
 
@@ -32,6 +31,7 @@ function RikerRumble() {
       const tableChanged =
         topThree.length !== scores.length ||
         topThree.some((val, i) => val !== scores[i]);
+
       if (tableChanged) {
         if (history.length === 10) history.shift();
         history.push([...scores]);
@@ -123,26 +123,23 @@ function RikerRumble() {
     );
   };
 
-  // -- NEW: Countdown Timer Logic --
-  const [minutesInput, setMinutesInput] = useState("40"); // default "40"
-  const [timeLeft, setTimeLeft] = useState(40 * 60); // store time in seconds
+  // -- Countdown Timer State/Logic --
+  const [minutesInput, setMinutesInput] = useState("40");
+  const [timeLeft, setTimeLeft] = useState(40 * 60);
   const [isRunning, setIsRunning] = useState(false);
 
-  // Start/Pause
   const handleStartPause = () => {
     setIsRunning((prev) => !prev);
   };
 
-  // Reset to minutesInput
   const handleReset = () => {
     const num = parseInt(minutesInput, 10);
     if (!isNaN(num)) {
       setTimeLeft(num * 60);
-      setIsRunning(false); // also pause
+      setIsRunning(false);
     }
   };
 
-  // Sync with isRunning
   useEffect(() => {
     let interval = null;
     if (isRunning) {
@@ -155,93 +152,109 @@ function RikerRumble() {
     };
   }, [isRunning]);
 
-  // Format for MM:SS display
   const formatTime = (seconds) => {
     const m = Math.floor(seconds / 60);
     const s = seconds % 60;
     return `${m.toString().padStart(2, "0")}:${s.toString().padStart(2, "0")}`;
   };
 
+  // -- NEW: Score Calculation for each player --
+  // Count colored rows (non-black background)
+  const player1Score = player1Scores.reduce((acc, p1, i) => {
+    const p2 = player2Scores[i];
+    return p1 > p2 && p1 > 0 ? acc + 1 : acc;
+  }, 0);
+
+  const player2Score = player2Scores.reduce((acc, p2, i) => {
+    const p1 = player1Scores[i];
+    return p2 > p1 && p2 > 0 ? acc + 1 : acc;
+  }, 0);
+
   return (
-    <>
-      <div style={globalRootStyle}>
-        {/* 1) Player columns */}
-        <div style={containerStyle}>
-          <PlayerColumn
-            label="Player 1"
-            playerName={player1Name}
-            setPlayerName={setPlayer1Name}
-            playerScoreInput={player1ScoreInput}
-            setPlayerScoreInput={setPlayer1ScoreInput}
-            onAdd={handlePlayer1Add}
-            onClear={() =>
-              handleClear(
-                player1Scores,
-                setPlayer1Scores,
-                player1History,
-                setPlayer1History
-              )
-            }
-            onUndo={() =>
-              handleUndo(
-                (player1Scores) => setPlayer1Scores(player1Scores),
-                player1History,
-                setPlayer1History
-              )
-            }
-          />
-          <PlayerColumn
-            label="Player 2"
-            playerName={player2Name}
-            setPlayerName={setPlayer2Name}
-            playerScoreInput={player2ScoreInput}
-            setPlayerScoreInput={setPlayer2ScoreInput}
-            onAdd={handlePlayer2Add}
-            onClear={() =>
-              handleClear(
-                player2Scores,
-                setPlayer2Scores,
-                player2History,
-                setPlayer2History
-              )
-            }
-            onUndo={() =>
-              handleUndo(
-                (player2Scores) => setPlayer2Scores(player2Scores),
-                player2History,
-                setPlayer2History
-              )
-            }
-          />
-        </div>
-
-        {/* 2) Timer Section (minutes input + reset/start/pause) */}
-        <TimerSection
-          minutesInput={minutesInput}
-          setMinutesInput={setMinutesInput}
-          handleReset={handleReset}
-          handleStartPause={handleStartPause}
+    <div style={globalRootStyle}>
+      {/* 1) Player columns */}
+      <div style={containerStyle}>
+        <PlayerColumn
+          label="Player 1"
+          playerName={player1Name}
+          setPlayerName={setPlayer1Name}
+          playerScoreInput={player1ScoreInput}
+          setPlayerScoreInput={setPlayer1ScoreInput}
+          onAdd={handlePlayer1Add}
+          onClear={() =>
+            handleClear(
+              player1Scores,
+              setPlayer1Scores,
+              player1History,
+              setPlayer1History
+            )
+          }
+          onUndo={() =>
+            handleUndo(
+              (player1Scores) => setPlayer1Scores(player1Scores),
+              player1History,
+              setPlayer1History
+            )
+          }
+          isRunning={isRunning}
         />
-
-        {/* 3) Title + "Clear All" */}
-        <TitleSection onClearAll={handleClearAll} />
-
-        {/* 4) Player Tables */}
-        <div style={containerStyle}>
-          <PlayerTable
-            playerName={player1Name}
-            rows={player1Scores.map(renderPlayer1Row)}
-          />
-          <PlayerTable
-            playerName={player2Name}
-            rows={player2Scores.map(renderPlayer2Row)}
-          />
-        </div>
-
-        {/* 5) Countdown Display (below the tables) */}
-        <CountdownDisplay timeString={formatTime(timeLeft)} />
+        <PlayerColumn
+          label="Player 2"
+          playerName={player2Name}
+          setPlayerName={setPlayer2Name}
+          playerScoreInput={player2ScoreInput}
+          setPlayerScoreInput={setPlayer2ScoreInput}
+          onAdd={handlePlayer2Add}
+          onClear={() =>
+            handleClear(
+              player2Scores,
+              setPlayer2Scores,
+              player2History,
+              setPlayer2History
+            )
+          }
+          onUndo={() =>
+            handleUndo(
+              (player2Scores) => setPlayer2Scores(player2Scores),
+              player2History,
+              setPlayer2History
+            )
+          }
+          isRunning={isRunning}
+        />
       </div>
-    </>
+
+      {/* 2) Timer Section (minutes input + reset/start/pause) */}
+      <TimerSection
+        minutesInput={minutesInput}
+        setMinutesInput={setMinutesInput}
+        handleReset={handleReset}
+        handleStartPause={handleStartPause}
+        isRunning={isRunning}
+      />
+
+      {/* 3) Title + "Clear All" */}
+      <TitleSection onClearAll={handleClearAll} isRunning={isRunning} />
+
+      {/* 4) Player Tables */}
+      <div style={containerStyle}>
+        <PlayerTable
+          playerName={player1Name}
+          rows={player1Scores.map(renderPlayer1Row)}
+        />
+        <PlayerTable
+          playerName={player2Name}
+          rows={player2Scores.map(renderPlayer2Row)}
+        />
+      </div>
+
+      {/* 5) Scores + Countdown (Under the tables, same row) */}
+      <ScoresCountdownRow
+        p1Score={player1Score}
+        p2Score={player2Score}
+        timeString={formatTime(timeLeft)}
+      />
+    </div>
   );
 }
 

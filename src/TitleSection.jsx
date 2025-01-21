@@ -6,12 +6,19 @@ import {
   headingStyle,
 } from "./RikerRumble.styles";
 
-function TitleSection({ onClearAll }) {
+/**
+ * TitleSection:
+ * - A "Clear All" button and "Riker Rumble" title.
+ * - "Clear All" button is disabled when timer is running.
+ */
+function TitleSection({ onClearAll, isRunning }) {
   return (
     <div style={middleContainerStyle}>
       <button
         style={{ ...buttonStyle, ...clearAllButtonStyle }}
         onClick={onClearAll}
+        disabled={isRunning}
+        onMouseDown={(e) => e.target.blur()}
       >
         Clear All
       </button>
@@ -24,6 +31,7 @@ function TitleSection({ onClearAll }) {
 
 TitleSection.propTypes = {
   onClearAll: PropTypes.func.isRequired,
+  isRunning: PropTypes.bool.isRequired,
 };
 
 export default TitleSection;

@@ -1,7 +1,6 @@
 import { useState, useEffect } from "react";
 import PlayerColumn from "./PlayerColumn";
 import PlayerTable from "./PlayerTable";
-import TitleSection from "./TitleSection";
 import TimerSection from "./TimerSection";
 import ScoresCountdownRow from "./ScoresCountdownRow";
 import {
@@ -10,11 +9,8 @@ import {
   rowBaseStyle,
 } from "./RikerRumble.styles";
 
-/*
- * This game mode was created by MirrorRiker, yay!
- * @returns 
- */
 function RikerRumble() {
+  // -- Existing state/logic for players --
   const [player1Name, setPlayer1Name] = useState("Player 1");
   const [player2Name, setPlayer2Name] = useState("Player 2");
 
@@ -35,7 +31,6 @@ function RikerRumble() {
       const tableChanged =
         topThree.length !== scores.length ||
         topThree.some((val, i) => val !== scores[i]);
-
       if (tableChanged) {
         if (history.length === 10) history.shift();
         history.push([...scores]);
@@ -128,22 +123,25 @@ function RikerRumble() {
   };
 
   // -- Countdown Timer State/Logic --
-  const [minutesInput, setMinutesInput] = useState("40");
-  const [timeLeft, setTimeLeft] = useState(40 * 60);
+  const [minutesInput, setMinutesInput] = useState("40"); // default "40"
+  const [timeLeft, setTimeLeft] = useState(40 * 60); // store time in seconds
   const [isRunning, setIsRunning] = useState(false);
 
+  // Start/Pause
   const handleStartPause = () => {
     setIsRunning((prev) => !prev);
   };
 
+  // Reset to minutesInput
   const handleReset = () => {
     const num = parseInt(minutesInput, 10);
     if (!isNaN(num)) {
       setTimeLeft(num * 60);
-      setIsRunning(false);
+      setIsRunning(false); // also pause
     }
   };
 
+  // Sync with isRunning
   useEffect(() => {
     let interval = null;
     if (isRunning) {
@@ -156,6 +154,7 @@ function RikerRumble() {
     };
   }, [isRunning]);
 
+  // Format for MM:SS display
   const formatTime = (seconds) => {
     const m = Math.floor(seconds / 60);
     const s = seconds % 60;
@@ -176,7 +175,17 @@ function RikerRumble() {
 
   return (
     <div style={globalRootStyle}>
-      {/* 1) Player columns */}
+      {/* 1) Minutes Section with Dropdown and Clear All */}
+      <TimerSection
+        minutesInput={minutesInput}
+        setMinutesInput={setMinutesInput}
+        handleReset={handleReset}
+        handleStartPause={handleStartPause}
+        isRunning={isRunning}
+        onClearAll={handleClearAll}
+      />
+
+      {/* 2) Player Information */}
       <div style={containerStyle}>
         <PlayerColumn
           label="Player 1"
@@ -228,19 +237,7 @@ function RikerRumble() {
         />
       </div>
 
-      {/* 2) Timer Section (minutes input + reset/start/pause) */}
-      <TimerSection
-        minutesInput={minutesInput}
-        setMinutesInput={setMinutesInput}
-        handleReset={handleReset}
-        handleStartPause={handleStartPause}
-        isRunning={isRunning}
-      />
-
-      {/* 3) Title + "Clear All" */}
-      <TitleSection onClearAll={handleClearAll} isRunning={isRunning} />
-
-      {/* 4) Player Tables */}
+      {/* 3) Player Tables */}
       <div style={containerStyle}>
         <PlayerTable
           playerName={player1Name}
@@ -252,7 +249,7 @@ function RikerRumble() {
         />
       </div>
 
-      {/* 5) Scores + Countdown (Under the tables, same row) */}
+      {/* 4) Scores + Countdown (Under the tables, same row) */}
       <ScoresCountdownRow
         p1Score={player1Score}
         p2Score={player2Score}

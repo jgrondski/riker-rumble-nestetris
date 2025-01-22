@@ -10,6 +10,10 @@ import {
   rowBaseStyle,
 } from "./RikerRumble.styles";
 
+/*
+ * This game mode was created by MirrorRiker, yay!
+ * @returns 
+ */
 function RikerRumble() {
   const [player1Name, setPlayer1Name] = useState("Player 1");
   const [player2Name, setPlayer2Name] = useState("Player 2");

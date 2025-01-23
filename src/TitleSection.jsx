@@ -1,17 +1,17 @@
-import { middleContainerStyle, headingStyle } from "./RikerRumble.styles";
+import { headingStyle } from "./RikerRumble.styles";
 
+/**
+ * TitleSection: "Riker Rumble"
+ * We rely on the parent container for horizontal centering.
+ */
 function TitleSection() {
   return (
-    <div style={middleContainerStyle}>
+    <div style={{ marginTop: "20px", marginBottom: "20px" }}>
       <h1 className="ribeye-marrow-regular" style={headingStyle}>
         Riker Rumble
       </h1>
     </div>
   );
 }
-
-TitleSection.propTypes = {
-  // No props needed anymore
-};
 
 export default TitleSection;

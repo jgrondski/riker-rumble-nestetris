@@ -24,15 +24,18 @@ function PlayerColumn({
     <div style={columnStyle}>
       <div style={nameContainerStyle}>
         <label style={labelStyle}>{label} Name:</label>
+        {/* Player name input (NOT disabled anymore) */}
         <input
           type="text"
           value={playerName}
           onChange={(e) => setPlayerName(e.target.value)}
           style={inputStyle}
+          // removed disabled={isRunning}
         />
       </div>
       <div style={scoreContainerStyle}>
         <label style={labelStyle}>{playerName} Score:</label>
+        {/* Player score input (NOT disabled anymore) */}
         <input
           type="number"
           value={playerScoreInput}
@@ -41,9 +44,11 @@ function PlayerColumn({
             if (e.key === "Enter") onAdd();
           }}
           style={inputStyle}
+          // removed disabled={isRunning}
         />
       </div>
       <div style={buttonGroupStyle}>
+        {/* clear button can remain disabled if you want, or remove */}
         <button
           style={buttonStyle}
           onClick={onClear}
@@ -52,14 +57,17 @@ function PlayerColumn({
         >
           clear
         </button>
+
+        {/* undo button (NOT disabled anymore) */}
         <button
           style={buttonStyle}
           onClick={onUndo}
-          disabled={isRunning}
+          // removed disabled={isRunning}
           onMouseDown={(e) => e.target.blur()}
         >
           undo
         </button>
+
         <button
           style={buttonStyle}
           onClick={onAdd}

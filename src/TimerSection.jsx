@@ -157,7 +157,7 @@ function TimerSection({
             height: "35px",
             textAlign: "center",
           }}
-          disabled={isRunning}
+          disabled={true}
           onMouseDown={(e) => e.target.blur()}
         >
           <option value="2">2 Players</option>

@@ -1,32 +1,22 @@
 import PropTypes from "prop-types";
-import CountdownDisplay from "./CountdownDisplay";
-import { containerStyle, scoreStyle } from "./RikerRumble.styles";
+import {
+  scoresCountdownContainer,
+  playerScoreLeftStyle,
+  playerScoreRightStyle,
+  countdownCenterStyle,
+} from "./RikerRumble.styles";
 
 /**
- * Displays Player 1 score (left), the countdown timer (center),
- * and Player 2 score (right) in the same row, under the tables.
+ * ScoresCountdownRow:
+ * Align p1Score near the left table, p2Score near the right table,
+ * and timeString in the center ~ (430px) total width or so.
  */
 function ScoresCountdownRow({ p1Score, p2Score, timeString }) {
   return (
-    <div
-      style={{
-        ...containerStyle,
-        justifyContent: "space-around",
-        marginTop: "5px",
-      }}
-    >
-      {/* Player 1 Score */}
-      <div className="ribeye-marrow-regular" style={scoreStyle}>
-        {p1Score}
-      </div>
-
-      {/* Countdown Timer in the center */}
-      <CountdownDisplay timeString={timeString} />
-
-      {/* Player 2 Score */}
-      <div className="ribeye-marrow-regular" style={scoreStyle}>
-        {p2Score}
-      </div>
+    <div className="ribeye-marrow-regular" style={scoresCountdownContainer}>
+      <div style={playerScoreLeftStyle}>{p1Score}</div>
+      <div style={countdownCenterStyle}>{timeString}</div>
+      <div style={playerScoreRightStyle}>{p2Score}</div>
     </div>
   );
 }

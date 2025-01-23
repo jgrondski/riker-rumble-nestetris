@@ -1,24 +1,16 @@
 import { useState } from "react";
 import PropTypes from "prop-types";
 import {
-  middleContainerStyle,
   labelStyle,
   inputStyle,
   buttonStyle,
   clearAllButtonStyle,
+  timerSectionContainer,
+  resetAllScoresWrapper,
+  timerMiddleWrapper,
+  timerInputWrapper,
+  playersDropdownWrapper,
 } from "./RikerRumble.styles";
-
-/**
- * TimerSection (final style):
- * - 120px tall, 625px wide (centered with margin: "30px").
- * - Single row with 3 segments:
- *   1) Reset All Scores (left)
- *   2) Middle group: [Apply (5px from Minutes), Minutes input+label, Start (5px from Minutes)]
- *   3) # Of Players (right)
- * - We keep "Reset All Scores" and "Apply" disabled when the timer is running,
- *   but the Start button is never disabled. 
- * - The labels for "Minutes" and "# Of Players" appear ~5px above the inputs.
- */
 
 function TimerSection({
   minutesInput,
@@ -32,45 +24,24 @@ function TimerSection({
   const startPauseLabel = isRunning ? "Pause" : "Start";
 
   return (
-    <div
-      style={{
-        ...middleContainerStyle,
-        width: "625px",
-        height: "120px",
-        margin: "30px",
-        display: "flex",
-        flexDirection: "row",
-        justifyContent: "space-between",
-        alignItems: "center",
-      }}
-    >
-      {/* LEFT: Reset All Scores */}
-      <div style={{ position: "relative", width: "140px", height: "35px" }}>
+    <div style={timerSectionContainer}>
+      <div style={resetAllScoresWrapper}>
         <button
           style={{
             ...buttonStyle,
             ...clearAllButtonStyle,
-            width: "140px",
+            width: "150px",
             height: "35px",
           }}
           onClick={handleClearAll}
-          disabled={isRunning} 
+          disabled={isRunning}
           onMouseDown={(e) => e.target.blur()}
         >
           Reset All Scores
         </button>
       </div>
 
-      {/* MIDDLE: Apply, Minutes label+input, Start in a row. */}
-      <div
-        style={{
-          display: "flex",
-          flexDirection: "row",
-          alignItems: "center",
-          gap: "5px",
-        }}
-      >
-        {/* Apply button (still disabled if isRunning) */}
+      <div style={timerMiddleWrapper}>
         <button
           style={{
             ...buttonStyle,
@@ -84,14 +55,7 @@ function TimerSection({
           Apply
         </button>
 
-        {/* Minutes: label above input */}
-        <div
-          style={{
-            position: "relative",
-            width: "120px",
-            height: "35px",
-          }}
-        >
+        <div style={timerInputWrapper}>
           <label
             style={{
               ...labelStyle,
@@ -115,16 +79,16 @@ function TimerSection({
               height: "35px",
               marginBottom: 0,
             }}
-            disabled={isRunning} 
+            disabled={isRunning}
             onMouseDown={(e) => e.target.blur()}
           />
         </div>
 
-        {/* Start button (NOT disabled anymore) */}
         <button
           style={{
             ...buttonStyle,
-            width: "60px",
+            ...clearAllButtonStyle,
+            width: "px",
             height: "35px",
           }}
           onClick={handleStartPause}
@@ -134,8 +98,7 @@ function TimerSection({
         </button>
       </div>
 
-      {/* RIGHT: # Of Players */}
-      <div style={{ position: "relative", width: "120px", height: "35px" }}>
+      <div style={playersDropdownWrapper}>
         <label
           style={{
             ...labelStyle,

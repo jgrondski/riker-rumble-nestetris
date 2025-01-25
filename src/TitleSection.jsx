@@ -6,7 +6,7 @@ import { headingStyle } from "./RikerRumble.styles";
  */
 function TitleSection() {
   return (
-    <div style={{ marginTop: "20px", marginBottom: "20px" }}>
+    <div style={{ marginTop: "20px" }}>
       <h1 className="ribeye-marrow-regular" style={headingStyle}>
         Riker Rumble
       </h1>

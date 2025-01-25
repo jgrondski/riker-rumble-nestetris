@@ -12,6 +12,11 @@ import {
   playersDropdownWrapper,
 } from "./RikerRumble.styles";
 
+/**
+ * TimerSection:
+ * - # Of Players dropdown: no longer disabled, matches Undo’s rules (never disables).
+ * - Calls handlePlayerCountChange(newValue) in RikerRumble to update the layout.
+ */
 function TimerSection({
   minutesInput,
   setMinutesInput,
@@ -19,12 +24,20 @@ function TimerSection({
   handleStartPause,
   isRunning,
   handleClearAll,
+  handlePlayerCountChange, // NEW
 }) {
-  const [playerCount, setPlayerCount] = useState("2");
+  const [playerCount, setPlayerCount] = useState("2"); // local dropdown state
   const startPauseLabel = isRunning ? "Pause" : "Start";
+
+  const onDropdownChange = (e) => {
+    const newValue = e.target.value;
+    setPlayerCount(newValue);
+    handlePlayerCountChange(newValue); // inform RikerRumble
+  };
 
   return (
     <div style={timerSectionContainer}>
+      {/* LEFT: Reset All Scores */}
       <div style={resetAllScoresWrapper}>
         <button
           style={{
@@ -41,6 +54,7 @@ function TimerSection({
         </button>
       </div>
 
+      {/* MIDDLE: Apply, Minutes, Start */}
       <div style={timerMiddleWrapper}>
         <button
           style={{
@@ -88,7 +102,7 @@ function TimerSection({
           style={{
             ...buttonStyle,
             ...clearAllButtonStyle,
-            width: "px",
+            width: "100px",
             height: "35px",
           }}
           onClick={handleStartPause}
@@ -98,6 +112,7 @@ function TimerSection({
         </button>
       </div>
 
+      {/* RIGHT: # Of Players (never disabled now) */}
       <div style={playersDropdownWrapper}>
         <label
           style={{
@@ -114,13 +129,12 @@ function TimerSection({
         </label>
         <select
           value={playerCount}
-          onChange={(e) => setPlayerCount(e.target.value)}
+          onChange={onDropdownChange}
           style={{
             width: "120px",
             height: "35px",
             textAlign: "center",
           }}
-          disabled={true}
           onMouseDown={(e) => e.target.blur()}
         >
           <option value="2">2 Players</option>
@@ -139,6 +153,7 @@ TimerSection.propTypes = {
   handleStartPause: PropTypes.func.isRequired,
   isRunning: PropTypes.bool.isRequired,
   handleClearAll: PropTypes.func.isRequired,
+  handlePlayerCountChange: PropTypes.func.isRequired, // NEW
 };
 
 export default TimerSection;

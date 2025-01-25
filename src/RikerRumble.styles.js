@@ -97,8 +97,6 @@ export const middleContainerStyle = {
   alignItems: "center",
   marginTop: "10px",
   marginBottom: "10px",
-  marginLeft: "20px",
-  marginRight: "20px",
 };
 
 export const countdownDisplayStyle = {

@@ -10,41 +10,60 @@ import {
   timerMiddleWrapper,
   timerInputWrapper,
   playersDropdownWrapper,
+  // Newly extracted local style constants
+  timerSectionOuterContainerStyle,
+  resetAllButtonStyle,
+  applyButtonStyle,
+  minutesInputStyle,
+  startPauseButtonStyle,
+  dropdownStyle,
 } from "./RikerRumble.styles";
 
 /**
  * TimerSection:
- * - # Of Players dropdown: no longer disabled, matches Undo’s rules (never disables).
- * - Calls handlePlayerCountChange(newValue) in RikerRumble to update the layout.
+ * - Shifts horizontally depending on playerCount to remain centered
+ *   with the Player columns / tables when 3 or 4 players.
+ * - All inline styles have been moved into RikerRumble.styles.js
  */
 function TimerSection({
+  playerCount,
   minutesInput,
   setMinutesInput,
   handleReset,
   handleStartPause,
   isRunning,
   handleClearAll,
-  handlePlayerCountChange, // NEW
+  handlePlayerCountChange,
 }) {
-  const [playerCount, setPlayerCount] = useState("2"); // local dropdown state
+  const [localCount, setLocalCount] = useState("2");
   const startPauseLabel = isRunning ? "Pause" : "Start";
 
   const onDropdownChange = (e) => {
     const newValue = e.target.value;
-    setPlayerCount(newValue);
-    handlePlayerCountChange(newValue); // inform RikerRumble
+    setLocalCount(newValue);
+    handlePlayerCountChange(newValue);
+  };
+
+  // Decide the shift: 3 players => ~120px, 4 players => ~240px, else 0
+  const marginLeft =
+    playerCount === 3 ? "120px" : playerCount === 4 ? "240px" : "0px";
+
+  // Combine base container + dynamic margin-left
+  const containerStyle = {
+    ...timerSectionContainer,
+    ...timerSectionOuterContainerStyle, // ensures we have the "transition: margin-left 0.3s"
+    marginLeft,
   };
 
   return (
-    <div style={timerSectionContainer}>
+    <div style={containerStyle}>
       {/* LEFT: Reset All Scores */}
       <div style={resetAllScoresWrapper}>
         <button
           style={{
             ...buttonStyle,
             ...clearAllButtonStyle,
-            width: "150px",
-            height: "35px",
+            ...resetAllButtonStyle,
           }}
           onClick={handleClearAll}
           disabled={isRunning}
@@ -59,8 +78,7 @@ function TimerSection({
         <button
           style={{
             ...buttonStyle,
-            width: "60px",
-            height: "35px",
+            ...applyButtonStyle,
           }}
           onClick={handleReset}
           disabled={isRunning}
@@ -89,9 +107,7 @@ function TimerSection({
             onChange={(e) => setMinutesInput(e.target.value)}
             style={{
               ...inputStyle,
-              width: "120px",
-              height: "35px",
-              marginBottom: 0,
+              ...minutesInputStyle,
             }}
             disabled={isRunning}
             onMouseDown={(e) => e.target.blur()}
@@ -102,8 +118,7 @@ function TimerSection({
           style={{
             ...buttonStyle,
             ...clearAllButtonStyle,
-            width: "100px",
-            height: "35px",
+            ...startPauseButtonStyle,
           }}
           onClick={handleStartPause}
           onMouseDown={(e) => e.target.blur()}
@@ -112,14 +127,14 @@ function TimerSection({
         </button>
       </div>
 
-      {/* RIGHT: # Of Players (never disabled now) */}
+      {/* RIGHT: # Of Players */}
       <div style={playersDropdownWrapper}>
         <label
           style={{
             ...labelStyle,
             marginBottom: 0,
-            textAlign: "center",
             position: "absolute",
+            textAlign: "center",
             top: "-20px",
             left: 0,
             right: 0,
@@ -128,13 +143,9 @@ function TimerSection({
           # Of Players
         </label>
         <select
-          value={playerCount}
+          value={localCount}
           onChange={onDropdownChange}
-          style={{
-            width: "120px",
-            height: "35px",
-            textAlign: "center",
-          }}
+          style={dropdownStyle}
           onMouseDown={(e) => e.target.blur()}
         >
           <option value="2">2 Players</option>
@@ -147,13 +158,14 @@ function TimerSection({
 }
 
 TimerSection.propTypes = {
+  playerCount: PropTypes.number.isRequired,
   minutesInput: PropTypes.string.isRequired,
   setMinutesInput: PropTypes.func.isRequired,
   handleReset: PropTypes.func.isRequired,
   handleStartPause: PropTypes.func.isRequired,
   isRunning: PropTypes.bool.isRequired,
   handleClearAll: PropTypes.func.isRequired,
-  handlePlayerCountChange: PropTypes.func.isRequired, // NEW
+  handlePlayerCountChange: PropTypes.func.isRequired,
 };
 
 export default TimerSection;

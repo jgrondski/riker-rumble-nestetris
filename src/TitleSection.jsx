@@ -1,12 +1,12 @@
-import { headingStyle } from "./RikerRumble.styles";
+import { headingStyle, titleSectionWrapperStyle } from "./RikerRumble.styles";
 
 /**
  * TitleSection: "Riker Rumble"
- * We rely on the parent container for horizontal centering.
+ * Moves the marginTop & textAlign styles into the component itself.
  */
 function TitleSection() {
   return (
-    <div style={{ marginTop: "20px" }}>
+    <div style={titleSectionWrapperStyle}>
       <h1 className="ribeye-marrow-regular" style={headingStyle}>
         Riker Rumble
       </h1>

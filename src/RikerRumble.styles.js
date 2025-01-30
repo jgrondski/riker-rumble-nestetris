@@ -100,14 +100,12 @@ export const middleContainerStyle = {
 };
 
 export const countdownDisplayStyle = {
-  display: "flex",
-  flexDirection: "column",
-  alignItems: "center",
   fontSize: "2.8em",
 };
 
 export const nameContainerStyle = {
   marginBottom: "10px",
+  textAlign: "center",
 };
 
 export const scoreContainerStyle = {
@@ -163,34 +161,60 @@ export const playersDropdownWrapper = {
   height: "35px",
 };
 
-/* ------------------- EXTRACTED STYLES FOR ScoresCountdownRow ------------- */
+/* ------------------- TitleSection Styles ------------------- */
+export const titleSectionWrapperStyle = {
+  marginTop: "20px",
+  textAlign: "center",
+};
 
-/**
- * We'll set the container's width to match 2 tables plus some gap.
- * Each table is 185px => total 370.
- * Let's add ~60px gap => 430 px total.
- * We can center it with margin: "0 auto".
- */
-export const scoresCountdownContainer = {
-  width: "430px",
-  margin: "0px auto 20px auto",
+/* ------------------- CountdownDisplay Styles ------------------- */
+export const countdownDisplayWrapperStyle = {
+  textAlign: "center",
+  marginTop: "10px",
+};
+
+/* ------------------- Additional or existing Score/Countdown row styles, etc. */
+
+export const tableWrapperStyle = {
   display: "flex",
-  flexDirection: "row",
-  justifyContent: "space-between",
+  flexDirection: "column",
   alignItems: "center",
+  marginRight: "16px", // or any spacing you want between tables
 };
 
-export const playerScoreLeftStyle = {
-  ...scoreStyle,
-  // Align roughly with left table
+export const scoreboardStyle = {
+  fontSize: "2em",
+  marginTop: "10px",
+  textAlign: "center",
 };
 
-export const playerScoreRightStyle = {
-  ...scoreStyle,
-  // Align roughly with right table
+export const timerSectionOuterContainerStyle = {
+  transition: "margin-left 0.3s",
 };
 
-export const countdownCenterStyle = {
-  ...scoreStyle,
-  // or we can directly use countdownDisplayStyle if desired
+export const resetAllButtonStyle = {
+  width: "150px",
+  height: "35px",
+};
+
+export const applyButtonStyle = {
+  width: "60px",
+  height: "35px",
+};
+
+export const minutesInputStyle = {
+  width: "120px",
+  height: "35px",
+  marginBottom: 0,
+};
+
+export const startPauseButtonStyle = {
+  width: "100px",
+  height: "35px",
+};
+
+export const dropdownStyle = {
+  width: "120px",
+  height: "35px",
+  textAlign: "center",
 };

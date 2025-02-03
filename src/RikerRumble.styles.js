@@ -125,7 +125,6 @@ export const scoreStyle = {
 };
 
 /* ------------------- EXTRACTED STYLES FOR TimerSection ------------------- */
-
 export const timerSectionContainer = {
   width: "625px",
   height: "50px",
@@ -136,10 +135,16 @@ export const timerSectionContainer = {
   alignItems: "center",
 };
 
+export const timerSectionOuterContainerStyle = {
+  transition: "margin-left 0.3s",
+};
+
 export const resetAllScoresWrapper = {
   position: "relative",
   width: "140px",
   height: "35px",
+  marginLeft: "10px", // added 10px cushion on the left side
+  marginRight: "30px",
 };
 
 export const timerMiddleWrapper = {
@@ -147,6 +152,7 @@ export const timerMiddleWrapper = {
   flexDirection: "row",
   alignItems: "center",
   gap: "5px",
+  marginRight: "10px",
 };
 
 export const timerInputWrapper = {
@@ -159,6 +165,43 @@ export const playersDropdownWrapper = {
   position: "relative",
   width: "120px",
   height: "35px",
+  marginLeft: "10px", // add a 10px gap between controls
+  marginRight: "10px",
+};
+
+/* ------------------- New Styles for "# Of Scores" Input ------------------- */
+export const scoresCountWrapperStyle = {
+  position: "relative",
+  width: "120px",
+  height: "35px",
+  marginLeft: "10px",
+};
+
+export const scoresCountLabelStyle = {
+  ...labelStyle,
+  marginBottom: 0,
+  position: "absolute",
+  textAlign: "center",
+  top: "-20px",
+  left: 0,
+  right: 0,
+};
+
+export const scoresCountInputStyle = {
+  ...inputStyle,
+  width: "120px",
+  height: "35px",
+  marginBottom: 0,
+};
+
+export const applyButtonStyle = {
+  width: "60px",
+  height: "35px",
+};
+
+export const scoresCountApplyButtonStyle = {
+  ...applyButtonStyle,
+  marginLeft: "5px",
 };
 
 /* ------------------- TitleSection Styles ------------------- */
@@ -173,13 +216,12 @@ export const countdownDisplayWrapperStyle = {
   marginTop: "10px",
 };
 
-/* ------------------- Additional or existing Score/Countdown row styles, etc. */
-
+/* ------------------- Player Table Styles ------------------- */
 export const tableWrapperStyle = {
   display: "flex",
   flexDirection: "column",
   alignItems: "center",
-  marginRight: "16px", // or any spacing you want between tables
+  marginRight: "16px",
 };
 
 export const scoreboardStyle = {
@@ -188,17 +230,9 @@ export const scoreboardStyle = {
   textAlign: "center",
 };
 
-export const timerSectionOuterContainerStyle = {
-  transition: "margin-left 0.3s",
-};
-
+/* ------------------- Existing extracted styles for TimerSection buttons ------------------- */
 export const resetAllButtonStyle = {
   width: "150px",
-  height: "35px",
-};
-
-export const applyButtonStyle = {
-  width: "60px",
   height: "35px",
 };
 
@@ -211,10 +245,4 @@ export const minutesInputStyle = {
 export const startPauseButtonStyle = {
   width: "100px",
   height: "35px",
-};
-
-export const dropdownStyle = {
-  width: "120px",
-  height: "35px",
-  textAlign: "center",
 };

@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import PropTypes from "prop-types";
 import {
   labelStyle,
@@ -10,21 +10,17 @@ import {
   timerMiddleWrapper,
   timerInputWrapper,
   playersDropdownWrapper,
-  // Newly extracted local style constants
   timerSectionOuterContainerStyle,
   resetAllButtonStyle,
   applyButtonStyle,
   minutesInputStyle,
   startPauseButtonStyle,
-  dropdownStyle,
+  scoresCountWrapperStyle,
+  scoresCountLabelStyle,
+  scoresCountInputStyle,
+  scoresCountApplyButtonStyle,
 } from "./RikerRumble.styles";
 
-/**
- * TimerSection:
- * - Shifts horizontally depending on playerCount to remain centered
- *   with the Player columns / tables when 3 or 4 players.
- * - All inline styles have been moved into RikerRumble.styles.js
- */
 function TimerSection({
   playerCount,
   minutesInput,
@@ -34,29 +30,57 @@ function TimerSection({
   isRunning,
   handleClearAll,
   handlePlayerCountChange,
+  scoresCount,
+  handleScoresCountChange,
 }) {
-  const [localCount, setLocalCount] = useState("2");
+  const [localPlayerCount, setLocalPlayerCount] = useState(String(playerCount));
+  const [localScoresCount, setLocalScoresCount] = useState(String(scoresCount));
   const startPauseLabel = isRunning ? "Pause" : "Start";
 
-  const onDropdownChange = (e) => {
-    const newValue = e.target.value;
-    setLocalCount(newValue);
+  // When playerCount prop changes, update localScoresCount to the new default.
+  useEffect(() => {
+    const defaultScores = playerCount >= 3 ? "5" : "3";
+    setLocalScoresCount(defaultScores);
+  }, [playerCount]);
+
+  const onPlayerCountChange = (e) => {
+    let newValue = e.target.value;
+    if (newValue === "") {
+      setLocalPlayerCount("");
+      return;
+    }
+    const num = parseInt(newValue, 10);
+    if (num < 2) newValue = "2";
+    if (num > 4) newValue = "4";
+    setLocalPlayerCount(newValue);
     handlePlayerCountChange(newValue);
   };
 
-  // Decide the shift: 3 players => ~120px, 4 players => ~240px, else 0
-  const marginLeft =
-    playerCount === 3 ? "120px" : playerCount === 4 ? "240px" : "0px";
+  const onScoresCountChange = (e) => {
+    setLocalScoresCount(e.target.value);
+  };
 
-  // Combine base container + dynamic margin-left
-  const containerStyle = {
+  const onScoresCountApply = () => {
+    const num = parseInt(localScoresCount, 10);
+    if (!isNaN(num) && num >= 1 && num <= 10) {
+      handleScoresCountChange(num);
+    } else {
+      setLocalScoresCount(String(scoresCount));
+    }
+  };
+
+  // Determine horizontal shift based on playerCount
+  const marginLeft =
+    playerCount === 3 ? "30px" : playerCount === 4 ? "150px" : "0px";
+
+  const containerCombinedStyle = {
     ...timerSectionContainer,
-    ...timerSectionOuterContainerStyle, // ensures we have the "transition: margin-left 0.3s"
+    ...timerSectionOuterContainerStyle,
     marginLeft,
   };
 
   return (
-    <div style={containerStyle}>
+    <div style={containerCombinedStyle}>
       {/* LEFT: Reset All Scores */}
       <div style={resetAllScoresWrapper}>
         <button
@@ -76,17 +100,13 @@ function TimerSection({
       {/* MIDDLE: Apply, Minutes, Start */}
       <div style={timerMiddleWrapper}>
         <button
-          style={{
-            ...buttonStyle,
-            ...applyButtonStyle,
-          }}
+          style={{ ...buttonStyle, ...applyButtonStyle }}
           onClick={handleReset}
           disabled={isRunning}
           onMouseDown={(e) => e.target.blur()}
         >
           Apply
         </button>
-
         <div style={timerInputWrapper}>
           <label
             style={{
@@ -105,15 +125,14 @@ function TimerSection({
             type="number"
             value={minutesInput}
             onChange={(e) => setMinutesInput(e.target.value)}
-            style={{
-              ...inputStyle,
-              ...minutesInputStyle,
+            onKeyDown={(e) => {
+              if (e.key === "Enter") handleReset();
             }}
+            style={{ ...inputStyle, ...minutesInputStyle }}
             disabled={isRunning}
             onMouseDown={(e) => e.target.blur()}
           />
         </div>
-
         <button
           style={{
             ...buttonStyle,
@@ -127,7 +146,7 @@ function TimerSection({
         </button>
       </div>
 
-      {/* RIGHT: # Of Players */}
+      {/* RIGHT: Now an integer input for "# Of Players" */}
       <div style={playersDropdownWrapper}>
         <label
           style={{
@@ -142,16 +161,41 @@ function TimerSection({
         >
           # Of Players
         </label>
-        <select
-          value={localCount}
-          onChange={onDropdownChange}
-          style={dropdownStyle}
+        <input
+          type="number"
+          value={localPlayerCount}
+          onChange={onPlayerCountChange}
+          style={scoresCountInputStyle}
+          min="2"
+          max="4"
+          onMouseDown={(e) => e.target.blur()}
+        />
+      </div>
+
+      {/* NEW: # Of Scores */}
+      <div style={scoresCountWrapperStyle}>
+        <label style={scoresCountLabelStyle}># Of Scores</label>
+        <input
+          type="number"
+          value={localScoresCount}
+          onChange={onScoresCountChange}
+          onKeyDown={(e) => {
+            if (e.key === "Enter") onScoresCountApply();
+          }}
+          style={scoresCountInputStyle}
+          min="1"
+          max="10"
+          onMouseDown={(e) => e.target.blur()}
+        />
+      </div>
+      <div>
+        <button
+          style={{ ...buttonStyle, ...scoresCountApplyButtonStyle }}
+          onClick={onScoresCountApply}
           onMouseDown={(e) => e.target.blur()}
         >
-          <option value="2">2 Players</option>
-          <option value="3">3 Players</option>
-          <option value="4">4 Players</option>
-        </select>
+          Apply
+        </button>
       </div>
     </div>
   );
@@ -166,6 +210,8 @@ TimerSection.propTypes = {
   isRunning: PropTypes.bool.isRequired,
   handleClearAll: PropTypes.func.isRequired,
   handlePlayerCountChange: PropTypes.func.isRequired,
+  scoresCount: PropTypes.number.isRequired,
+  handleScoresCountChange: PropTypes.func.isRequired,
 };
 
 export default TimerSection;

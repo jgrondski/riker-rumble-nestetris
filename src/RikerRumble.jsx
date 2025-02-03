@@ -6,39 +6,19 @@ import TimerSection from "./TimerSection";
 import CountdownDisplay from "./CountdownDisplay";
 import {
   globalRootStyle,
-  rowBaseStyle,
   upperContainerStyle,
+  rowBaseStyle,
 } from "./RikerRumble.styles";
 
 function RikerRumble() {
   const [playerCount, setPlayerCount] = useState(2);
 
-  // Instead of separate states, store each player's data in an array of objects:
+  // Store each player's data as an array
   const [players, setPlayers] = useState([
-    {
-      name: "Player 1",
-      scoreInput: "",
-      scores: [0, 0, 0],
-      history: [],
-    },
-    {
-      name: "Player 2",
-      scoreInput: "",
-      scores: [0, 0, 0],
-      history: [],
-    },
-    {
-      name: "Player 3",
-      scoreInput: "",
-      scores: [0, 0, 0],
-      history: [],
-    },
-    {
-      name: "Player 4",
-      scoreInput: "",
-      scores: [0, 0, 0],
-      history: [],
-    },
+    { name: "Player 1", scoreInput: "", scores: [0, 0, 0], history: [] },
+    { name: "Player 2", scoreInput: "", scores: [0, 0, 0], history: [] },
+    { name: "Player 3", scoreInput: "", scores: [0, 0, 0], history: [] },
+    { name: "Player 4", scoreInput: "", scores: [0, 0, 0], history: [] },
   ]);
 
   // Timer states
@@ -46,23 +26,32 @@ function RikerRumble() {
   const [timeLeft, setTimeLeft] = useState(40 * 60);
   const [isRunning, setIsRunning] = useState(false);
 
-  // # Of Players
+  // NEW: State for "# Of Scores" (default 3 for 2 players, 5 for 3/4 players)
+  const [scoresCount, setScoresCount] = useState(playerCount >= 3 ? 5 : 3);
+
+  // When playerCount changes, reset scoresCount AND minutes/timeLeft to defaults.
+  useEffect(() => {
+    setScoresCount(playerCount >= 3 ? 5 : 3);
+    if (playerCount >= 3) {
+      setMinutesInput("60");
+      setTimeLeft(60 * 60);
+    } else {
+      setMinutesInput("40");
+      setTimeLeft(40 * 60);
+    }
+  }, [playerCount]);
+
   const handlePlayerCountChange = (val) => setPlayerCount(parseInt(val, 10));
+  const getTopN = () => scoresCount;
 
-  // Decide topN
-  const getTopN = () => (playerCount >= 3 ? 5 : 3);
-
-  // We can define a single function for Add/Undo/Clear that uses playerIndex
+  // Single functions using playerIndex:
   const handleAddScore = (playerIndex) => {
     const updatedPlayers = [...players];
     const player = updatedPlayers[playerIndex];
-
     const newScore = parseInt(player.scoreInput, 10);
     if (!isNaN(newScore)) {
-      // sort, slice
       const updatedScores = [...player.scores, newScore].sort((a, b) => b - a);
       const sliced = updatedScores.slice(0, getTopN());
-
       if (
         sliced.length !== player.scores.length ||
         sliced.some((v, i) => v !== player.scores[i])
@@ -72,16 +61,13 @@ function RikerRumble() {
         player.scores = sliced;
       }
     }
-    player.scoreInput = ""; // clear the input after adding
-
-    // set updated array
+    player.scoreInput = "";
     setPlayers(updatedPlayers);
   };
 
   const handleUndo = (playerIndex) => {
     const updatedPlayers = [...players];
     const player = updatedPlayers[playerIndex];
-
     if (player.history.length > 0) {
       const previous = player.history[player.history.length - 1];
       player.scores = previous;
@@ -93,7 +79,6 @@ function RikerRumble() {
   const handleClear = (playerIndex) => {
     const updatedPlayers = [...players];
     const player = updatedPlayers[playerIndex];
-
     const isAlreadyCleared = player.scores.every((s) => s === 0);
     if (!isAlreadyCleared) {
       if (player.history.length === 10) player.history.shift();
@@ -109,7 +94,6 @@ function RikerRumble() {
     }
   };
 
-  // **NEW**: handleNameChange, handleScoreInputChange to fix "unresponsive" text fields
   const handleNameChange = (playerIndex, newName) => {
     const updatedPlayers = [...players];
     updatedPlayers[playerIndex].name = newName;
@@ -142,14 +126,12 @@ function RikerRumble() {
       if (interval) clearInterval(interval);
     };
   }, [isRunning]);
-
   const formatTime = (sec) => {
     const m = Math.floor(sec / 60);
     const s = sec % 60;
     return `${m.toString().padStart(2, "0")}:${s.toString().padStart(2, "0")}`;
   };
 
-  // color checks, scoreboard logic, tableRows logic => define similarly
   // Example color function
   const colorFn = (playerIndex, val, i) => {
     for (let p = 0; p < playerCount; p++) {
@@ -161,14 +143,18 @@ function RikerRumble() {
     return ["#f51dff", "#1d70ff", "#1DB954", "#FF8C1D"][playerIndex];
   };
 
-  // Table row
   const tableRows = (pIndex) => {
     const player = players[pIndex];
     const topN = getTopN();
-    const padded = player.scores.concat(
-      new Array(topN - player.scores.length).fill(0)
-    );
-    return padded.map((val, i) => {
+    let rows;
+    if (player.scores.length >= topN) {
+      rows = player.scores.slice(0, topN);
+    } else {
+      rows = player.scores.concat(
+        new Array(topN - player.scores.length).fill(0)
+      );
+    }
+    return rows.map((val, i) => {
       const bg = colorFn(pIndex, val, i);
       return (
         <tr key={i}>
@@ -180,7 +166,6 @@ function RikerRumble() {
     });
   };
 
-  // scoreboard
   const getScore = (pIndex) => {
     const player = players[pIndex];
     return player.scores.reduce((acc, val, i) => {
@@ -201,12 +186,13 @@ function RikerRumble() {
           isRunning={isRunning}
           handleClearAll={handleClearAll}
           handlePlayerCountChange={handlePlayerCountChange}
+          scoresCount={scoresCount}
+          handleScoresCountChange={setScoresCount}
         />
         <PlayerColumnsContainer
           playerCount={playerCount}
           isRunning={isRunning}
           players={players}
-          // pass new "handleNameChange" & "handleScoreInputChange"
           handleNameChange={handleNameChange}
           handleScoreInputChange={handleScoreInputChange}
           handleAddScore={handleAddScore}
@@ -214,10 +200,8 @@ function RikerRumble() {
           handleUndo={handleUndo}
         />
       </div>
-
       <TitleSection />
       <CountdownDisplay timeString={formatTime(timeLeft)} />
-
       <PlayerTablesContainer
         playerCount={playerCount}
         players={players}
